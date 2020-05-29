@@ -1,6 +1,9 @@
 package ua.test.escondido.eureka.client.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +15,7 @@ import ua.test.escondido.eureka.client.data.request.InvoiceRequest;
 import ua.test.escondido.eureka.client.entity.Invoice;
 import ua.test.escondido.eureka.client.service.InvoiceService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -22,6 +26,8 @@ public class InvoiceController {
 
     @Autowired
     private InvoiceService invoiceService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @RequestMapping(value = "", method = POST)
     @Transactional
@@ -40,8 +46,11 @@ public class InvoiceController {
 
     @RequestMapping(value = "", method = GET)
     @Transactional
-    public ResponseEntity<List<Invoice>> getAll() {
-        return new ResponseEntity<>(invoiceService.getAll(),HttpStatus.OK);
+    public ResponseEntity<ObjectNode> getAll(HttpServletRequest httpRequest) {
+        ObjectNode result = objectMapper.createObjectNode()
+                .putPOJO("template", invoiceService.getAll());
+        result.put("Instance", httpRequest.getServerPort());
+        return new ResponseEntity<>(result,HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{invoiceId}", method = GET)
