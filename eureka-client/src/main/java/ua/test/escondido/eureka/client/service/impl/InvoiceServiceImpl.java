@@ -59,7 +59,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void delete(String invoiceId) {
-
+        invoiceRepository.deleteById(invoiceId);
     }
 
     private void setupInvoice(InvoiceRequest invoiceRequest, Invoice invoice) {

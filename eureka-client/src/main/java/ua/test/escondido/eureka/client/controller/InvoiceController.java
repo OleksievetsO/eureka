@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ua.test.escondido.eureka.client.data.request.InvoiceRequest;
+import ua.test.escondido.eureka.client.entity.Invoice;
 import ua.test.escondido.eureka.client.service.InvoiceService;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
+import java.util.List;
+
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 @RequestMapping("/invoice")
@@ -30,9 +32,28 @@ public class InvoiceController {
 
     @RequestMapping(value = "/{invoiceId}", method = PUT)
     @Transactional
-    public ResponseEntity addInvoice(@RequestBody InvoiceRequest invoiceRequest,
+    public ResponseEntity updateInvoice(@RequestBody InvoiceRequest invoiceRequest,
                                      @PathVariable String invoiceId) {
         invoiceService.update(invoiceId, invoiceRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "", method = GET)
+    @Transactional
+    public ResponseEntity<List<Invoice>> getAll() {
+        return new ResponseEntity<>(invoiceService.getAll(),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{invoiceId}", method = GET)
+    @Transactional
+    public ResponseEntity<Invoice> getById(@PathVariable String invoiceId) {
+        return new ResponseEntity<>(invoiceService.getById(invoiceId),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{invoiceId}", method = DELETE)
+    @Transactional
+    public ResponseEntity deleteInvoice(@PathVariable String invoiceId) {
+        invoiceService.delete(invoiceId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
