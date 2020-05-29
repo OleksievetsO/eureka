@@ -36,13 +36,35 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Invoice getById(String invoiceId) {
-        return invoiceRepository.findById(invoiceId).orElseThrow(() -> new BadRequestException(String.format("Invoice with ID %s not found!", invoiceId)));
+        return invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new BadRequestException(String.format("Invoice with ID %s not found!", invoiceId)));
     }
 
     @Override
     public void save(InvoiceRequest invoiceRequest) {
+        Invoice invoice = new Invoice();
+        setupInvoice(invoiceRequest, invoice);
+        invoiceRepository.save(invoice);
+    }
+
+
+
+    @Override
+    public void update(String invoiceId, InvoiceRequest invoiceRequest) {
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new BadRequestException(String.format("Invoice with ID %s not found!", invoiceId)));
+        setupInvoice(invoiceRequest, invoice);
+        invoiceRepository.save(invoice);
+    }
+
+    @Override
+    public void delete(String invoiceId) {
+
+    }
+
+    private void setupInvoice(InvoiceRequest invoiceRequest, Invoice invoice) {
         Seller seller = invoiceRequest.getSeller();
-        Seller savedSeller = sellerRepository.findByName(seller.getName()).get();
+        Seller savedSeller = sellerRepository.findByName(seller.getName()).orElseGet(null);
         if (savedSeller == null) {
             savedSeller = new Seller();
         }
@@ -54,7 +76,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Seller sellerInDB = sellerRepository.save(savedSeller);
 
         Buyer buyer = invoiceRequest.getBuyer();
-        Buyer savedBuyer = buyerRepository.findByName(buyer.getName()).get();
+        Buyer savedBuyer = buyerRepository.findByName(buyer.getName()).orElseGet(null);
         if (savedBuyer == null) {
             savedBuyer = new Buyer();
         }
@@ -65,22 +87,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         savedBuyer.setZipCode(buyer.getZipCode());
         Buyer buyerInDB = buyerRepository.save(buyer);
 
-        Invoice invoice = new Invoice();
+
         invoice.setInvoiceNumber(invoiceRequest.getInvoiceNumber());
         invoice.setIssueDate(invoiceRequest.getIssueDate());
         invoice.setDueDate(invoiceRequest.getDueDate());
         invoice.setPaymentType(invoiceRequest.getPaymentType());
         invoice.setSeller(sellerInDB);
         invoice.setBuyer(buyerInDB);
-    }
-
-    @Override
-    public void update(String invoiceId, InvoiceRequest invoice) {
-
-    }
-
-    @Override
-    public void delete(String invoiceId) {
-
     }
 }
