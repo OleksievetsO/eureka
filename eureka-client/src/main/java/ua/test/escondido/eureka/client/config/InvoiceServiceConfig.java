@@ -11,5 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "invoice-service")
 public class InvoiceServiceConfig {
-    private String property;
+
+    //@Value("${invoice-service.api.port}")
+    private String apiPort;
+    private String apiName;
+    private String apiDescriptio;
 }
