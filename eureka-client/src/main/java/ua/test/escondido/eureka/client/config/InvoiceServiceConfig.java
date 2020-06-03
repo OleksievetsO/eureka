@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "invoice-service")
+@ConfigurationProperties(prefix = "service")
 public class InvoiceServiceConfig {
 
-    //@Value("${invoice-service.api.port}")
+    @Value("${invoice-service.api.port}")
     private String apiPort;
     private String apiName;
     private String apiDescriptio;
