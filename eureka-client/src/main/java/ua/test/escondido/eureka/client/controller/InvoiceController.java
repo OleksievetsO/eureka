@@ -50,7 +50,6 @@ public class InvoiceController {
     @RequestMapping(value = "", method = GET)
     @Transactional
     public ResponseEntity<ObjectNode> getAll(HttpServletRequest httpRequest) {
-        Assert.notNull(config);
         ObjectNode result = objectMapper.createObjectNode()
                 .putPOJO("template", invoiceService.getAll());
         result.put("Instance", httpRequest.getServerPort());

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "service")
 public class InvoiceServiceConfig {
 
-    @Value("${invoice-service.api.port}")
+    //@Value("${invoice-service.api.port}")
     private String apiPort;
     private String apiName;
     private String apiDescriptio;

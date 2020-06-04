@@ -1,6 +1,10 @@
 package ua.test.escondido.eureka.client.service.impl;
 
+import com.mongodb.MongoTimeoutException;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import ua.test.escondido.eureka.client.data.request.InvoiceRequest;
 import ua.test.escondido.eureka.client.entity.Buyer;
@@ -12,6 +16,7 @@ import ua.test.escondido.eureka.client.repository.SellerRepository;
 import ua.test.escondido.eureka.client.repository.InvoiceRepository;
 import ua.test.escondido.eureka.client.service.InvoiceService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +35,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @HystrixCommand(fallbackMethod = "invoiceStub")
+    @Retryable(
+            value = {MongoTimeoutException.class},
+            maxAttempts = 4, backoff = @Backoff(2000))
     public List<Invoice> getAll() {
         return invoiceRepository.findAll();
     }
@@ -94,5 +103,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setPaymentType(invoiceRequest.getPaymentType());
         invoice.setSeller(sellerInDB);
         invoice.setBuyer(buyerInDB);
+    }
+
+    public List<Invoice> invoiceStub(){
+        return new ArrayList<>();
     }
 }
